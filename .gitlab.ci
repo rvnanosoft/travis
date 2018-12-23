@@ -1,0 +1,29 @@
+image: node:6
+
+stages:
+  - test
+  - deploy
+
+test:
+  stage: test
+  cache:
+    paths:
+      - node_modules/
+    key: "node_modules"
+    untracked: true
+  script:
+    - npm install --silent
+    # add "npm run build" any other steps here
+    - npm test
+
+publish:
+  stage: deploy
+  # no need to cache anything, we are just
+  # installing new tool
+  before_script:
+    - npm install -g --quiet semantic-release-gitlab
+  # only publish from master, exclude pure tag builds
+  only:
+    - master@gleb/foo
+  script:
+    - semantic-release-gitlab || true
